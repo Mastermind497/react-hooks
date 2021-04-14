@@ -3,6 +3,7 @@
 
 import * as React from 'react'
 
+// Look at Video 50 Later
 function useLocalStorageState(key: string, defaultValue: string = '') {
   const [state, setState] = React.useState(
     () => window.localStorage.getItem(key) || defaultValue,
@@ -34,7 +35,7 @@ function Greeting({initialName = ''}: {initialName?: string}) {
 }
 
 function App() {
-  return <Greeting />
+  return <Greeting initialName="Johnny" />
 }
 
 export default App
