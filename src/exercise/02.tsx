@@ -7,7 +7,7 @@ function Greeting({initialName = ''}: {initialName?: string}) {
   // 🐨 initialize the state to the value from localStorage
   // 💰 window.localStorage.getItem('name') || initialName
   const [name, setName] = React.useState(
-    window.localStorage.getItem('name') || initialName,
+    () => window.localStorage.getItem('name') || initialName,
   )
 
   // 🐨 Here's where you'll use `React.useEffect`.
@@ -17,14 +17,15 @@ function Greeting({initialName = ''}: {initialName?: string}) {
     window.localStorage.setItem('name', name)
   })
 
+  function handleEvent(event: React.SyntheticEvent<HTMLInputElement>) {
+    setName(event.currentTarget.value)
+  }
+
   return (
     <div>
       <form>
         <label htmlFor="name">Name: </label>
-        <input
-          onChange={event => setName(event.currentTarget.value)}
-          id="name"
-        />
+        <input value={name} onChange={handleEvent} id="name" />
       </form>
       {name ? <strong>Hello {name}</strong> : 'Please type your name'}
     </div>
