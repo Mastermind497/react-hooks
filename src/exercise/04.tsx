@@ -8,21 +8,13 @@ import {
   calculateWinner,
 } from '../tic-tac-toe-utils'
 import type {Squares} from '../tic-tac-toe-utils'
+import {useLocalStorageState} from '../utils'
 
 function Board() {
-  const [squares, setSquares] = React.useState(() => {
-    try {
-      return (
-        JSON.parse(window.localStorage.getItem('board')) || Array(9).fill(null)
-      )
-    } catch (e) {
-      return Array(9).fill(null)
-    }
-  })
-
-  React.useEffect(() => {
-    window.localStorage.setItem('board', JSON.stringify(squares))
-  })
+  const [squares, setSquares] = useLocalStorageState(
+    'board',
+    Array(9).fill(null),
+  )
 
   const nextValue = calculateNextValue(squares)
   const winner = calculateWinner(squares)
