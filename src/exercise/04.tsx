@@ -10,32 +10,10 @@ import {
 import type {Squares} from '../tic-tac-toe-utils'
 import {useLocalStorageState} from '../utils'
 
-function Board() {
-  const [squares, setSquares] = useLocalStorageState(
-    'board',
-    Array(9).fill(null),
-  )
-
-  const nextValue = calculateNextValue(squares)
-  const winner = calculateWinner(squares)
-  const status = calculateStatus(winner, squares, nextValue)
-
-  function selectSquare(index: number) {
-    if (winner || squares[index]) {
-      return
-    }
-    const squaresCopy = [...squares]
-    squaresCopy[index] = nextValue
-    setSquares(squaresCopy)
-  }
-
-  function restart() {
-    setSquares(Array(9).fill(null))
-  }
-
+function Board({squares, onClick}) {
   function renderSquare(i: number) {
     return (
-      <button className="square" onClick={() => selectSquare(i)}>
+      <button className="square" onClick={() => onClick(i)}>
         {squares[i]}
       </button>
     )
@@ -43,7 +21,6 @@ function Board() {
 
   return (
     <div>
-      <div className="status">{status}</div>
       <div className="board-row">
         {renderSquare(0)}
         {renderSquare(1)}
@@ -59,18 +36,52 @@ function Board() {
         {renderSquare(7)}
         {renderSquare(8)}
       </div>
-      <button className="restart" onClick={restart}>
-        restart
-      </button>
     </div>
   )
 }
 
 function App() {
+  const [moves, setMoves] = useLocalStorageState<Array<Squares>>(
+    'tic-tac-toe:history',
+    [Array(9).fill(null)],
+  )
+  const [current, setCurrent] = useLocalStorageState<number>(
+    'tic-tac-toe:current',
+    0,
+  )
+
+  const currentSquares = moves[current]
+  const nextValue = calculateNextValue(currentSquares)
+  const winner = calculateWinner(currentSquares)
+  const status = calculateStatus(winner, currentSquares, nextValue)
+
+  function selectSquare(index: number) {
+    if (winner || moves[current][index]) {
+      return
+    }
+    const squaresCopy = [...moves[current]]
+    squaresCopy[index] = nextValue
+    moves.slice(0, current + 1)
+    setCurrent(current + 1)
+    setMoves([...moves, squaresCopy])
+  }
+
+  function restart() {
+    setCurrent(0)
+    setMoves([Array(9).fill(null)])
+  }
+
   return (
     <div className="game">
       <div className="game-board">
-        <Board />
+        <Board squares={moves[current]} onClick={selectSquare} />
+        <button className="restart" onClick={restart}>
+          restart
+        </button>
+      </div>
+      <div className="game-info">
+        <div className="status">{status}</div>
+        <div className="history"></div>
       </div>
     </div>
   )
